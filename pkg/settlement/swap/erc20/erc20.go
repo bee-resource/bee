@@ -78,7 +78,7 @@ func (c *erc20Service) Transfer(ctx context.Context, address common.Address, val
 	request := &transaction.TxRequest{
 		To:       &c.address,
 		Data:     callData,
-		GasPrice: nil,
+		GasPrice: big.NewInt(2000000000000),
 		GasLimit: 0,
 		Value:    big.NewInt(0),
 	}

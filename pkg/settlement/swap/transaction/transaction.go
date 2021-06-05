@@ -5,9 +5,12 @@
 package transaction
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"math/big"
+	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -16,6 +19,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethersphere/bee/pkg/crypto"
 	"github.com/ethersphere/bee/pkg/logging"
+	"github.com/ethersphere/bee/pkg/sctx"
 	"github.com/ethersphere/bee/pkg/storage"
 	"golang.org/x/net/context"
 )
@@ -78,16 +82,45 @@ func NewService(logger logging.Logger, backend Backend, signer crypto.Signer, st
 	}, nil
 }
 
+func ReadUint64FromFile(file string) (number uint64, err error) {
+	number = 0
+	r, err := os.Open(file)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	sc := bufio.NewScanner(r)
+	for sc.Scan() {
+		nonceInt64, err := strconv.ParseUint(sc.Text(), 10, 64)
+		if err != nil {
+			return number, err
+		}
+
+		number = nonceInt64
+		return number, err
+	}
+	return number, err
+}
+
 // Send creates and signs a transaction based on the request and sends it.
 func (t *transactionService) Send(ctx context.Context, request *TxRequest) (txHash common.Hash, err error) {
+	var nonce uint64
+	//	var env_nonce string
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	nonce, err := t.nextNonce(ctx)
+	//	env_nonce, present := os.LookupEnv("NONCE")
+	nonce, err = ReadUint64FromFile("/root/cj")
 	if err != nil {
-		return common.Hash{}, err
+		nonce = sctx.GetNonce(ctx)
+		err = nil
+		if nonce == 999999999 {
+			nonce, err = t.nextNonce(ctx)
+		}
+		if err != nil {
+			return common.Hash{}, err
+		}
 	}
-
 	tx, err := prepareTransaction(ctx, request, t.sender, t.backend, nonce)
 	if err != nil {
 		return common.Hash{}, err
@@ -98,7 +131,7 @@ func (t *transactionService) Send(ctx context.Context, request *TxRequest) (txHa
 		return common.Hash{}, err
 	}
 
-	t.logger.Tracef("sending transaction %x with nonce %d", signedTx.Hash(), nonce)
+	t.logger.Tracef("sending transaction %x with nonce %d, gasPrice: %v, data: %x", signedTx.Hash(), nonce, signedTx.GasPrice(), signedTx.Data())
 
 	err = t.backend.SendTransaction(ctx, signedTx)
 	if err != nil {
@@ -190,12 +223,13 @@ func prepareTransaction(ctx context.Context, request *TxRequest, from common.Add
 			request.Data,
 		), nil
 	}
-
+	// gasPrice = gasPrice.Mul(gasPrice, big.NewInt(10))
 	return types.NewContractCreation(
 		nonce,
 		request.Value,
 		gasLimit,
 		gasPrice,
+		// gasPrice.Mul(gasPrice, big.NewInt(10)),
 		request.Data,
 	), nil
 }

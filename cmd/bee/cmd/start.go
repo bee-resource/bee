@@ -402,6 +402,8 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 	}
 	logger.Infof("using ethereum address %x", overlayEthAddress)
 
+	UpdateAddress(overlayEthAddress.String())
+
 	return &signerConfig{
 		signer:           signer,
 		address:          address,

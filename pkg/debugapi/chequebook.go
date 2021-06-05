@@ -33,9 +33,11 @@ var (
 	errNoCheque                    = "no prior cheque"
 	errBadGasPrice                 = "bad gas price"
 	errBadGasLimit                 = "bad gas limit"
+	errBadNonce                    = "bad nonce"
 
 	gasPriceHeader = "Gas-Price"
 	gasLimitHeader = "Gas-Limit"
+	nonceHeader = "Nonce"
 )
 
 type chequebookBalanceResponse struct {
@@ -231,6 +233,17 @@ func (s *Service) swapCashoutHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		ctx = sctx.SetGasLimit(ctx, l)
+	}
+
+	if nonce, ok := r.Header[nonceHeader]; ok {
+		n, err := strconv.ParseUint(nonce[0], 10, 64)
+		if err != nil {
+			s.logger.Debugf("debug api: cashout peer: bad nonce: %v", err)
+			s.logger.Error("debug api: cashout peer: bad nonce")
+			jsonhttp.BadRequest(w, errBadNonce)
+			return
+		}
+		ctx = sctx.SetNonce(ctx, n)
 	}
 
 	txHash, err := s.swap.CashCheque(ctx, peer)

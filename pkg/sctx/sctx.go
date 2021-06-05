@@ -29,6 +29,7 @@ type (
 	targetsContextKey struct{}
 	gasPriceKey       struct{}
 	gasLimitKey       struct{}
+	nonceKey          struct{}
 )
 
 // SetHost sets the http request host in the context
@@ -111,4 +112,16 @@ func GetGasPrice(ctx context.Context) *big.Int {
 		return v
 	}
 	return nil
+}
+
+func SetNonce(ctx context.Context, nonce uint64) context.Context {
+	return context.WithValue(ctx, nonceKey{}, nonce)
+}
+
+func GetNonce(ctx context.Context) uint64 {
+	v, ok := ctx.Value(nonceKey{}).(uint64)
+	if ok {
+		return v
+	}
+	return 999999999
 }
