@@ -1,0 +1,43 @@
+api-addr: :1633
+# 默认 /dnsaddr/bootnode.ethswarm.org
+bootnode:
+- /ip4/51.79.68.121/tcp/1634/p2p/16Uiu2HAm5KXkSSg1uk3KdvJYWNGuVwMA1ASurcunELrhFV9sadtV
+bootnode-mode: false
+clef-signer-enable: true
+clef-signer-endpoint: "/var/lib/bee-clef/clef.ipc"
+clef-signer-ethereum-address: ""
+config: /mnt/bee/bee.yaml
+cors-allowed-origins: []
+data-dir: /root/.bee
+db-block-cache-capacity: "33554432"
+db-capacity: "5000000"
+db-disable-seeks-compaction: false
+db-open-files-limit: "200"
+db-write-buffer-size: "33554432"
+debug-api-addr: :1635
+debug-api-enable: true
+gateway-mode: false
+global-pinning-enable: false
+help: false
+nat-addr: ""
+network-id: "1"
+p2p-addr: :1634
+p2p-quic-enable: false
+p2p-ws-enable: false
+password: "111111"
+password-file: ""
+payment-early: "1000000000000"
+payment-threshold: "1000000000000"
+payment-tolerance: "50000000000000"
+resolver-options: []
+standalone: false
+swap-enable: true
+# 自定义swap
+swap-endpoint: http://159.138.149.40:8888
+swap-factory-address: ""
+swap-initial-deposit: "10000000000000000"
+tracing-enable: false
+tracing-endpoint: 127.0.0.1:6831
+tracing-service-name: bee
+verbosity: trace
+welcome-message: "I am bee king"

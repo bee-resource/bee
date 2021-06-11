@@ -1,0 +1,5 @@
+{
+  name            : 'bee',
+  script          : '/root/bee-node/bee',
+  args            : 'start --config /root/bee-node/bee.yaml',
+}

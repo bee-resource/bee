@@ -1,0 +1,5 @@
+{
+  name            : 'clef-service',
+  script          : './clef-service',
+  args            : 'start',
+}
