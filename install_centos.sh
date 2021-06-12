@@ -1,4 +1,3 @@
-cd bee
 mkdir /root/bee-node
 mv bee /root/bee-node/
 mv bee.yaml /root/bee-node/
